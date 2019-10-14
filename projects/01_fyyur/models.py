@@ -27,12 +27,13 @@ manager.add_command('db', MigrateCommand)
 #    properties, as a database migration.
 # ** DONE **
 #----------------------------------------------------------------------------#
-
+'''
 class State(db.Model):
     __tablename__ = 'states'
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True, nullable=False)
     name = db.Column(db.String(2), nullable=False)
+'''
 
 class Venue(db.Model):
     __tablename__ = 'venues'
@@ -42,8 +43,8 @@ class Venue(db.Model):
     genres = db.Column(db.ARRAY(db.String))
     address = db.Column(db.String(120))
     city = db.Column(db.String(120))
-    # state = db.Column(db.String(120))
-    state_id = db.Column(db.Integer, db.ForeignKey('states.id'), nullable=False)
+    state = db.Column(db.String(120))
+    # state_id = db.Column(db.Integer, db.ForeignKey('states.id'), nullable=False)
     phone = db.Column(db.String(120))
     website = db.Column(db.String(150))
     facebook_link = db.Column(db.String(150))
@@ -58,8 +59,8 @@ class Artist(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True, nullable=False)
     name = db.Column(db.String)
     city = db.Column(db.String(120))
-    # state = db.Column(db.String(120))
-    state_id = db.Column(db.Integer, db.ForeignKey('states.id'), nullable=False)
+    state = db.Column(db.String(120))
+    # state_id = db.Column(db.Integer, db.ForeignKey('states.id'), nullable=False)
     phone = db.Column(db.String(120))
     genres = db.Column(db.String(120))
     image_link = db.Column(db.String(500))

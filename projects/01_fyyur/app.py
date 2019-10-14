@@ -54,27 +54,20 @@ def index():
 def venues():
   # TODO: replace with real venues data.
   #       num_shows should be aggregated based on number of upcoming shows per venue.
-  data=[{
-    "city": "San Francisco",
-    "state": "CA",
-    "venues": [{
-      "id": 1,
-      "name": "The Musical Hop",
-      "num_upcoming_shows": 0,
-    }, {
-      "id": 3,
-      "name": "Park Square Live Music & Coffee",
-      "num_upcoming_shows": 1,
-    }]
-  }, {
-    "city": "New York",
-    "state": "NY",
-    "venues": [{
-      "id": 2,
-      "name": "The Dueling Pianos Bar",
-      "num_upcoming_shows": 0,
-    }]
-  }]
+
+  venues = db.engine.execute("select ARRAY_AGG(name) as names, ARRAY_AGG(id) as ids, city, state from venues group by city, state;")
+  data = []
+  for row in venues:
+    response.append({
+      "city": row.city,
+      "state": row.state,
+      "venues": [{
+        "id": venueId,
+        "name": venueName,
+        "num_upcoming_shows": len(Show.query.filter(Show.venue_id==venueId, Show.start_time > datetime.now()).all())
+        } for venueId, venueName in zip(row.ids, row.names) ]
+    })
+
   return render_template('pages/venues.html', areas=data);
 
 @app.route('/venues/search', methods=['POST'])
