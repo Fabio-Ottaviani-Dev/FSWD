@@ -129,7 +129,31 @@ To start and run the local development server,
   $ pip install -r requirements.txt
   ```
 
-3. Run the development server:
+3. db setup:
+  ```
+
+  $ dropdb fyyur && createdb fyyur
+  $ rm -r migrations/ # (if it's set)
+  $ python models.py db init
+  $ python models.py db migrate
+  $ python models.py db upgrade
+
+  $ psql fyyur
+  $ \dt
+              List of relations
+   Schema |      Name       | Type  | Owner
+  --------+-----------------+-------+-------
+   public | alembic_version | table | XY
+   public | artists         | table | XY
+   public | shows           | table | XY
+   public | venues          | table | XY
+  (4 rows)
+
+  \q
+
+  ```
+
+4. Run the development server:
   ```
   $ export FLASK_APP=myapp
   $ export FLASK_ENV=development # enables debug mode
