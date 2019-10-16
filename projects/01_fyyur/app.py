@@ -6,6 +6,7 @@ import json
 import dateutil.parser
 import babel
 from flask import Flask, render_template, request, Response, flash, redirect, url_for
+from flask_debugtoolbar import DebugToolbarExtension # https://flask-debugtoolbar.readthedocs.io/en/latest/
 from flask_moment import Moment
 from flask_sqlalchemy import SQLAlchemy
 import logging
@@ -13,6 +14,7 @@ from logging import Formatter, FileHandler
 #from flask_wtf import Form
 from flask_wtf import FlaskForm
 from forms import *
+from models import Artist, Venue, Show
 
 #----------------------------------------------------------------------------#
 # App Config.
@@ -23,6 +25,15 @@ from forms import *
 app = Flask(__name__)
 moment = Moment(app)
 app.config.from_object('config')
+
+# the toolbar is only enabled in debug mode:
+app.debug = True
+
+# set a 'SECRET_KEY' to enable the Flask session cookies
+app.config['SECRET_KEY'] = '<replace with a secret key>'
+
+toolbar = DebugToolbarExtension(app)
+
 db = SQLAlchemy(app)
 
 #----------------------------------------------------------------------------#
@@ -425,10 +436,15 @@ def create_artist_submission():
     		seeking_venue = False,
     		seeking_description = 'ND'
         )
+    # Debug
+        print('name: --> ' + request.form.get('name'))
+        print(newArtist)
+
         db.session.add(newArtist)
         db.session.commit()
         flash('Artist ' + request.form['name'] + ' was successfully listed!')
     except:
+        # flash('An error occurred in Artist | ' + 'Debug: --> Name: ' + request.form.get('name'))
         flash('An error occurred. Artist ' + request.form['name'] + ' could not be listed.')
         db.session.rollback()
     finally:

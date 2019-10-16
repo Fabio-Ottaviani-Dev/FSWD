@@ -3,6 +3,9 @@
 # Docs:
 # https://flask-migrate.readthedocs.io/en/latest/#using-flask-script
 # python3 models.py db init, migrate, upgrade, downgrade.
+
+# How to print instances of a class using print()
+# https://stackoverflow.com/questions/1535327/how-to-print-instances-of-a-class-using-print
 #----------------------------------------------------------------------------#
 
 from flask import Flask
@@ -55,8 +58,10 @@ class Venue(db.Model):
     shows = db.relationship('Show', backref=db.backref('venue', lazy=True))
 
     def __repr__(self):
-      return f'<Venue: ID: {self.id}, Name: {self.name}>'
+        return f'<Venue: ID: {self.id}, Name: {self.name},  City: {self.city}>'
 
+    def __str__(self):
+        return str(self.__class__) + ": " + str(self.__dict__)
 
 class Artist(db.Model):
     __tablename__ = 'artists'
@@ -76,8 +81,10 @@ class Artist(db.Model):
     shows = db.relationship('Show', backref=db.backref('artist', lazy=True))
 
     def __repr__(self):
-        return f'<Artist: ID: {self.id}, Name: {self.name}>'
+        return f'<Artist: ID: {self.id}, Name: {self.name},  City: {self.city}>'
 
+    def __str__(self):
+        return str(self.__class__) + ": " + str(self.__dict__)
 
 class Show(db.Model):
     __tablename__ = 'shows'
@@ -86,6 +93,12 @@ class Show(db.Model):
     artist_id = db.Column(db.Integer, db.ForeignKey('artists.id'), nullable=False)
     venue_id = db.Column(db.Integer, db.ForeignKey('venues.id'), nullable=False)
     start_time = db.Column(db.DateTime())
+
+    def __repr__(self):
+        return f'<Show: ID: {self.id}, artist_id: {self.artist_id},  venue_id: {self.venue_id}>'
+
+    def __str__(self):
+        return str(self.__class__) + ": " + str(self.__dict__)
 
 #----------------------------------------------------------------------------#
 
