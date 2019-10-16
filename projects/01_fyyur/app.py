@@ -381,7 +381,7 @@ def edit_artist(artist_id):
         city            = artist.city,
         state           = artist.state,
         phone           = artist.phone,
-        genres          = artist.genres'
+        genres          = artist.genres,
         facebook_link   = artist.facebook_link
     )
     return render_template('forms/edit_artist.html', form=form, artist=artist)
