@@ -9,6 +9,7 @@ from flask import Flask, render_template, request, Response, flash, redirect, ur
 from flask_debugtoolbar import DebugToolbarExtension # https://flask-debugtoolbar.readthedocs.io/en/latest/
 from flask_moment import Moment
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import func
 import logging
 from logging import Formatter, FileHandler
 #from flask_wtf import Form (deprecate!)
@@ -106,8 +107,17 @@ def create_venue_submission():
 
 @app.route('/venues')
 def venues():
-    sql = 'SELECT ARRAY_AGG(name) as names, ARRAY_AGG(id) as ids, city, state FROM venues GROUP BY city, state;'
-    venues = db.engine.execute(sql)
+
+    venues = db.session.query(
+        func.array_agg(Venue.name).label('names'),
+        func.array_agg(Venue.id).label('ids'),
+        Venue.city,
+        Venue.state
+    ).group_by(
+        Venue.city,
+        Venue.state
+    ).all()
+
     response = []
     for row in venues:
         response.append({
@@ -462,7 +472,15 @@ def server_error(error):
 
 @app.route('/shows')
 def shows():
-    shows = Show.query.join(Artist, Show.artist_id == Artist.id).join(Venue, Show.venue_id == Venue.id).all()
+
+    shows = Show.query.join(
+        Artist,
+        Show.artist_id == Artist.id
+    ).outerjoin(
+        Venue,
+        Show.venue_id == Venue.id
+    ).all()
+
     response = [{
         'venue_id':             show.venue.id,
         'venue_name':           show.venue.name,
