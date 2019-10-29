@@ -8,4 +8,4 @@ These projects are part of [Full-Stack Web Developer Nanodegree](https://www.uda
 
 ### Projects
 1. [Fyyur](https://github.com/Fabio-Ottaviani-Dev/FSWD/tree/master/projects/01_fyyur)
-2. [Trivia API]https://github.com/Fabio-Ottaviani-Dev/FSWD/tree/master/projects/02_trivia_api
+2. [Trivia API](https://github.com/Fabio-Ottaviani-Dev/FSWD/tree/master/projects/02_trivia_api)
