@@ -37,7 +37,7 @@ def create_app(test_config=None):
         return response
 
 # ----------------------------------------------------------------------------
-# Read > All Categories
+# Read >> All Categories
 # ----------------------------------------------------------------------------
 # @TODO: Create an endpoint to handle GET requests, for all available categories.
 # **DONE**
@@ -49,44 +49,74 @@ def create_app(test_config=None):
 
     @app.route('/categories', methods=['GET'])
     def get_all_categories():
-        categories = Category.query.order_by(Category.id).all()
-        response = [category.format() for category in categories]
+        categories          = Category.query.order_by(Category.id).all()
+        response            = [category.format() for category in categories]
+        total_categories    = len(response)
 
-        if len(response) == 0:
+        if total_categories == 0:
             abort(404)
 
         return jsonify({
-            'success': True,
-            'categories': response,
-            'total_categories': len(response)
+            'success':          True,
+            'categories':       response,
+            'total_categories': total_categories
         })
 
 # ----------------------------------------------------------------------------
+# Read >> Questions
+# ----------------------------------------------------------------------------
+# @TODO: Create an endpoint to handle GET requests for questions,
+# including pagination (every 10 questions).
+# This endpoint should return a list of questions,
+# number of total questions, current category, categories.
+# **DONE**
+    # Test
+    # curl -X GET http://127.0.0.1:5000/questions    | OK
 
-  # '''
-  # @TODO:
-  # Create an endpoint to handle GET requests for questions,
-  # including pagination (every 10 questions).
-  # This endpoint should return a list of questions,
-  # number of total questions, current category, categories.
-  #
-  # TEST: At this point, when you start the application
-  # you should see questions and categories generated,
-  # ten questions per page and pagination at the bottom of the screen for three pages.
-  # Clicking on the page numbers should update the questions.
-  # '''
+# **TODO** FE TEST: At this point, when you start the application
+# you should see questions and categories generated,
+# ten questions per page and pagination at the bottom of the screen for three pages.
+# Clicking on the page numbers should update the questions.
+
+    @app.route('/questions', methods=['GET'])
+    def get_questions():
+        page        = request.args.get('page', 1, type=int)
+        start       = (page - 1) * QUESTIONS_PER_PAGE
+        end         = start + QUESTIONS_PER_PAGE
+
+        questions = Question.query.order_by(Question.id).all()
+
+        response_questions  = [question.format() for question in questions]
+        total_questions     = len(response_questions)
+        response_set        = response_questions[start:end]
+
+        if len(response_set) == 0:
+            abort(404)
+
+        categories          = Category.query.order_by(Category.id).all()
+        response_categories = [category.format() for category in categories]
 
 
+        return jsonify({
+            'success':          True,
+            'questions':        response_questions,
+            'total_questions':  total_questions,
+            'current_category': None,
+            'categories':       response_categories,
+            'page': page
+        })
 
-  # '''
-  # @TODO:
-  # Create an endpoint to DELETE question using a question ID.
-  #
-  # TEST: When you click the trash icon next to a question, the question will be removed.
-  # This removal will persist in the database and when you refresh the page.
-  # '''
+# ----------------------------------------------------------------------------
+# Delete >> Questions >> by: id
+# ----------------------------------------------------------------------------
+# @TODO:
+# Create an endpoint to DELETE question using a question ID.
+#
+# TEST: When you click the trash icon next to a question, the question will be removed.
+# This removal will persist in the database and when you refresh the page.
 
 
+# ----------------------------------------------------------------------------
 
   # '''
   # @TODO:
