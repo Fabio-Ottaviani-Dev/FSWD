@@ -34,8 +34,11 @@ This will install all of the required packages we selected within the `requireme
 With Postgres running, restore a database using the trivia.psql file provided.
 From the backend folder in terminal run:
 ```bash
-createdb trivia
-psql trivia < trivia.psql
+
+createdb trivia && psql trivia < trivia.psql
+
+# test
+createdb trivia_test && psql trivia_test < trivia.psql
 
 psql trivia
 \dt
@@ -107,8 +110,9 @@ GET '/categories'
 ## Testing
 To run the tests, run
 ```
-dropdb trivia_test
-createdb trivia_test
+
+dropdb trivia_test && createdb trivia_test
 psql trivia_test < trivia.psql
-python test_flaskr.py
+python3 test_flaskr.py
+
 ```
