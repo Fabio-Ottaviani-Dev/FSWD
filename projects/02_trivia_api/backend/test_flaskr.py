@@ -116,11 +116,53 @@ class TriviaTestCase(unittest.TestCase):
         self.assertEqual(data['message'], 'Bad Request')
 
 # ----------------------------------------------------------------------------
+# Read >> Questions >> by category
+# ----------------------------------------------------------------------------
+    # successful operation
+    def test_get_questions_by_category(self):
+
+        id_category = 1
+
+        res = self.client().get('/api/categories/{}/questions'.format(id_category))
+        data = json.loads(res.data)
+
+        questions = (Question.query.filter(
+            Question.category == id_category
+        ).all())
+
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(data['success'], True)
+        self.assertTrue(len(data['questions']))
+        self.assertTrue(data['total_questions'])
+        self.assertTrue(data['current_category'])
+
+
+    # # expected error / s
+    def test_get_questions_by_category_404(self):
+        id_category = 999
+
+        res = self.client().get('/api/categories/{}/questions'.format(id_category))
+        data = json.loads(res.data)
+
+        questions = (Question.query.filter(
+            Question.category == id_category
+        ).all())
+
+        self.assertEqual(res.status_code, 404)
+        self.assertEqual(data['success'], False)
+        self.assertEqual(data['message'], 'Not Found')
+
+# ----------------------------------------------------------------------------
+# Read >> Questions >> to play
+# ----------------------------------------------------------------------------
+# **TODO**       
+
+# ----------------------------------------------------------------------------
 # Delete >> Question >> by: id
 # ----------------------------------------------------------------------------
     # successful operation
     def test_delete_question(self):
-        id_question = 30
+        id_question = 35
 
         res = self.client().delete('/api/questions/{}'.format(id_question))
         data = json.loads(res.data)
@@ -131,7 +173,7 @@ class TriviaTestCase(unittest.TestCase):
         self.assertEqual(question, None)
 
     # expected error / s
-    def test_404_delete_question(self):
+    def test_delete_question_404(self):
         id_question = 999
 
         res = self.client().delete('/api/questions/{}'.format(id_question))

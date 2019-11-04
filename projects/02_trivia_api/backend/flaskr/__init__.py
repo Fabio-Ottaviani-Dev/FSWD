@@ -1,12 +1,14 @@
 import os
-from flask import Flask, request, abort, jsonify
+
+from flask import Flask, request, abort, jsonify, session
 from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
 import random
+from  sqlalchemy.sql.expression import func, select
 
 from models import setup_db, Question, Category
 
-QUESTIONS_PER_PAGE = 4
+QUESTIONS_PER_PAGE = 10
 
 def create_app(test_config=None):
     # create and configure the app
@@ -31,7 +33,7 @@ def create_app(test_config=None):
     @app.after_request
     def after_request(response):
         response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization,true')
-        response.headers.add('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS')
+        response.headers.add('Access-Control-Allow-Methods', 'GET,POST,DELETE')
         return response
 
 # ----------------------------------------------------------------------------
@@ -60,6 +62,12 @@ def create_app(test_config=None):
         difficulty      = data.get('difficulty', None),
         category        = data.get('category', None)
 
+        question: this.state.question,
+        answer: this.state.answer,
+        difficulty: this.state.difficulty,
+        category: this.state.category
+
+
         if new_question is None or answer is None or difficulty is None or category is None:
             abort(400)
 
@@ -74,8 +82,8 @@ def create_app(test_config=None):
             question.insert()
 
             return jsonify({
-            'success': True,
-            'question': question.format()
+                'success':  True,
+                'question': question.format()
             }), 201 # 201 Created
 
         except:
@@ -97,6 +105,7 @@ def create_app(test_config=None):
 # OK 200 | curl -X GET http://127.0.0.1:5000/api/questions?page=1
 # OK 200 | curl -X GET http://127.0.0.1:5000/api/questions
 # OK 404 | curl -X GET http://127.0.0.1:5000/api/questions?page=999
+
 # **DONE**
 
     @app.route('/api/questions', methods=['GET'])
@@ -156,7 +165,7 @@ def create_app(test_config=None):
             abort(400)
 
         questions = Question.query.filter(
-        Question.question.ilike('%{}%'.format(search))
+            Question.question.ilike('%{}%'.format(search))
         ).all()
 
         total_questions = len(questions)
@@ -193,22 +202,87 @@ def create_app(test_config=None):
 # categories in the left column will cause only questions of that
 # category to be shown.
 
-    # @app.route('/api/categories/<int:category_id>/questions', methods=['GET'])
-    # def get_questions_by_category(category_id):
-    #
-    #     questions = (Question.query.
-    #     filter(Question.category == category_id).all())
-    #
-    #
-    #     if question is None:
-    #         abort(404)
-    #
-    #     return jsonify({
-    #         'success': True,
-    #         'questions': formatted_questions,
-    #         'total_questions': len(formatted_questions),
-    #         'current_category': category_id
-    #     })
+# 0K 200 | curl -X GET http://127.0.0.1:5000/api/categories/1/questions
+# 0K 404 | curl -X GET http://127.0.0.1:5000/api/categories/999/questions
+
+    @app.route('/api/categories/<int:id_category>/questions', methods=['GET'])
+    def get_questions_by_category(id_category):
+
+        questions = (Question.query.filter(
+            Question.category == id_category
+        ).all())
+
+        total_questions = len(questions)
+
+        if total_questions == 0:
+            abort(404)
+
+        questions_result = [question.format() for question in questions]
+
+        try:
+            return jsonify({
+                'success':          True,
+                'questions':        questions_result,
+                'total_questions':  total_questions,
+                'current_category': id_category
+            })
+
+        except:
+            abort(422)
+
+# ----------------------------------------------------------------------------
+# Read >> Questions >> to play
+# ----------------------------------------------------------------------------
+# ideas:
+# https://stackoverflow.com/questions/60805/getting-random-row-through-sqlalchemy
+# https://pythonhosted.org/Flask-Session/
+
+# @TODO:
+# Create a POST endpoint to get questions to play the quiz.
+# This endpoint should take category and previous question parameters
+# and return a random questions within the given category,
+# if provided, and that is not one of the previous questions.
+
+# TEST: In the "Play" tab, after a user selects "All" or a category,
+# one question at a time is displayed, the user is allowed to answer
+# and shown whether they were correct or not.
+
+# OK 200 | curl -X POST -H "Content-Type: application/json" -d '{"previous_question":"1", "category":"1"}' http://127.0.0.1:5000/api/quizzes
+
+    @app.route('/api/quizzes', methods=['POST'])
+    def get_quiz_question():
+
+        data = request.get_json()
+        previous_question  = data.get('previous_question', None)
+        category = data.get('category', None)
+
+        if category is None:
+            abort(400)
+
+        questions = (Question.query.filter(
+            Question.category == category
+        ).order_by(func.random()).limit(1).all())
+
+        questions_result = [question.format() for question in questions]
+
+        # try:
+        #     session['question_list']
+        # except NameError:
+        #     session['question_list'] = []
+        # else:
+        #     session['question_list'] = append(previous_questions)
+
+        # return jsonify({
+        #     'success': True,
+        #     'previous_question': previous_question,
+        #     'category': category,
+        #     'question': questions_result
+        # })
+
+        return jsonify({
+          'success': True,
+          'question': questions_result
+        })
 
 # ----------------------------------------------------------------------------
 # Delete >> Question >> by: id
@@ -261,20 +335,6 @@ def create_app(test_config=None):
             'categories':       response,
             'total_categories': total_categories
         })
-
-# ----------------------------------------------------------------------------
-  # @TODO:
-  # Create a POST endpoint to get questions to play the quiz.
-  # This endpoint should take category and previous question parameters
-  # and return a random questions within the given category,
-  # if provided, and that is not one of the previous questions.
-
-  # TEST: In the "Play" tab, after a user selects "All" or a category,
-  # one question at a time is displayed, the user is allowed to answer
-  # and shown whether they were correct or not.
-
-
-
 
 # ----------------------------------------------------------------------------
 # Error handler
