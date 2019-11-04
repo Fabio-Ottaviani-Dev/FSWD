@@ -17,7 +17,7 @@ class FormView extends Component {
 
   componentDidMount(){
     $.ajax({
-      url: `/api/categories`, //TODO: update request URL (**DONE**)
+      url: `/api/categories`,
       type: "GET",
       success: (result) => {
         this.setState({ categories: result.categories })
@@ -34,7 +34,7 @@ class FormView extends Component {
   submitQuestion = (event) => {
     event.preventDefault();
     $.ajax({
-      url: '/api/questions', //TODO: update request URL (**DONE**) 
+      url: '/api/questions',
       type: "POST",
       dataType: 'json',
       contentType: 'application/json',
@@ -89,9 +89,9 @@ class FormView extends Component {
           <label>
             Category
             <select name="category" onChange={this.handleChange}>
-              {Object.keys(this.state.categories).map(id => {
+              {this.state.categories.length > 0 && this.state.categories.map(category => {
                   return (
-                    <option key={id} value={id}>{this.state.categories[id]}</option>
+                    <option key={category.id} value={category.id}>{category.type}</option>
                   )
                 })}
             </select>

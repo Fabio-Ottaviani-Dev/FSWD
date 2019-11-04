@@ -62,12 +62,6 @@ def create_app(test_config=None):
         difficulty      = data.get('difficulty', None),
         category        = data.get('category', None)
 
-        question: this.state.question,
-        answer: this.state.answer,
-        difficulty: this.state.difficulty,
-        category: this.state.category
-
-
         if new_question is None or answer is None or difficulty is None or category is None:
             abort(400)
 
@@ -189,6 +183,7 @@ def create_app(test_config=None):
                 'total_questions':  total_questions,
                 'current_category': ''
             })
+       
         except:
           abort(422)
 
