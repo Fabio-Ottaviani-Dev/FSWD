@@ -86,31 +86,280 @@ python3 test_flaskr.py
 
 ```
 
-
 ## Endpoints
-**TODO**
-
-REVIEW_COMMENT
-```
-This README is missing documentation of your endpoints. Below is an example for your endpoint to get all categories. Please use it as a reference for creating your documentation and resubmit your code.
-
-Endpoints
-GET '/categories'
-GET ...
-POST ...
-DELETE ...
-
-GET '/categories'
-- Fetches a dictionary of categories in which the keys are the ids and the value is the corresponding string of the category
-- Request Arguments: None
-- Returns: An object with a single key, categories, that contains a object of id: category_string key:value pairs.
+### Create >> Question
+POST /api/questions
+Endpoint to POST a new question, which will require the question and answer text, category, and difficulty score.
+```bash
+# Endpoint: POST /api/questions
+# curl test
+curl -X POST -H "Content-Type: application/json" -d '{"question":"Which is the result of 2+2 ?","answer":"4","difficulty":"100","category":"1"}' http://127.0.0.1:5000/api/questions
+# Returns:
 {
-  '1' : "Science",
-  '2' : "Art",
-  '3' : "Geography",
-  '4' : "History",
-  '5' : "Entertainment",
-  '6' : "Sports"
+  "question": {
+    "answer": "4",
+    "category": 1,
+    "difficulty": 100,
+    "id": 33,
+    "question": "Which is the result of 2+2 ?"
+  },
+  "success": true
+}
+```
+### Read >> Questions
+GET /api/questions
+Endpoint to handle GET requests for questions, including pagination (every 10 questions). This endpoint should return a list of questions, number of total questions, current category, categories.
+```bash
+# Endpoint: GET /api/questions
+# curl test
+curl -X GET http://127.0.0.1:5000/api/questions?page=1
+# Returns:
+{
+  "categories": [
+    {
+      "id": 1,
+      "type": "Science"
+    },
+    {
+      "id": 2,
+      "type": "Art"
+    },
+    {
+      "id": 3,
+      "type": "Geography"
+    },
+    {
+      "id": 4,
+      "type": "History"
+    },
+    {
+      "id": 5,
+      "type": "Entertainment"
+    },
+    {
+      "id": 6,
+      "type": "Sports"
+    }
+  ],
+  "current_category": "",
+  "page": 1,
+  "questions": [
+    {
+      "answer": "Alexander Fleming",
+      "category": 1,
+      "difficulty": 3,
+      "id": 21,
+      "question": "Who discovered penicillin?"
+    },
+    {
+      "answer": "The Liver",
+      "category": 1,
+      "difficulty": 4,
+      "id": 20,
+      "question": "What is the heaviest organ in the human body?"
+    },
+    {
+      "answer": "Blood",
+      "category": 1,
+      "difficulty": 4,
+      "id": 22,
+      "question": "Hematology is a branch of medicine involving the study of what?"
+    },
+    {
+      "answer": "Escher",
+      "category": 2,
+      "difficulty": 1,
+      "id": 16,
+      "question": "Which Dutch graphic artist\u2013initials M C was a creator of optical illusions?"
+    },
+    {
+      "answer": "Jackson Pollock",
+      "category": 2,
+      "difficulty": 2,
+      "id": 19,
+      "question": "Which American artist was a pioneer of Abstract Expressionism, and a leading exponent of action painting?"
+    },
+    {
+      "answer": "Mona Lisa",
+      "category": 2,
+      "difficulty": 3,
+      "id": 17,
+      "question": "La Giaconda is better known as what?"
+    },
+    {
+      "answer": "One",
+      "category": 2,
+      "difficulty": 4,
+      "id": 18,
+      "question": "How many paintings did Van Gogh sell in his lifetime?"
+    },
+    {
+      "answer": "Lake Victoria",
+      "category": 3,
+      "difficulty": 2,
+      "id": 13,
+      "question": "What is the largest lake in Africa?"
+    },
+    {
+      "answer": "Agra",
+      "category": 3,
+      "difficulty": 2,
+      "id": 15,
+      "question": "The Taj Mahal is located in which Indian city?"
+    },
+    {
+      "answer": "The Palace of Versailles",
+      "category": 3,
+      "difficulty": 3,
+      "id": 14,
+      "question": "In which royal palace would you find the Hall of Mirrors?"
+    }
+  ],
+  "success": true,
+  "total_questions": 19
+}
+
+```
+### Read >> Questions >> Search
+POST /api/questions/search
+Endpoint to get questions based on a search term. It should return any questions for whom the search term is a substring of the question.
+```bash
+# Endpoint: POST /api/questions/search
+# curl test
+curl -X POST -H "Content-Type: application/json" -d '{"searchTerm":"lake"}' http://127.0.0.1:5000/api/questions/search
+# Returns:
+{
+  "current_category": "",
+  "questions": [
+    {
+      "answer": "Lake Victoria",
+      "category": 3,
+      "difficulty": 2,
+      "id": 13,
+      "question": "What is the largest lake in Africa?"
+    }
+  ],
+  "success": true,
+  "total_questions": 1
+}
+```
+### # Read >> Questions >> by category
+GET /api/categories/1/questions
+Endpoint to get questions based on category.
+```bash
+# Endpoint: GET /api/categories/1/questions
+# curl test
+curl -X GET http://127.0.0.1:5000/api/categories/1/questions
+# Returns:
+{
+  "current_category": 1,
+  "questions": [
+    {
+      "answer": "The Liver",
+      "category": 1,
+      "difficulty": 4,
+      "id": 20,
+      "question": "What is the heaviest organ in the human body?"
+    },
+    {
+      "answer": "Alexander Fleming",
+      "category": 1,
+      "difficulty": 3,
+      "id": 21,
+      "question": "Who discovered penicillin?"
+    },
+    {
+      "answer": "Blood",
+      "category": 1,
+      "difficulty": 4,
+      "id": 22,
+      "question": "Hematology is a branch of medicine involving the study of what?"
+    }
+  ],
+  "success": true,
+  "total_questions": 3
+}
+```
+### Read >> Questions >> to play
+POST /api/quizzes
+Endpoint to get questions to play the quiz, this endpoint should take category and previous question parameters and return a random questions within the given category.
+```bash
+# Endpoint: POST /api/quizzes
+#Request Arguments: An object with the keys previous_questions and quiz_category
+
+{
+    "previous_questions": [5, 9, 12, 23],
+    "quiz_category": {
+        "type": "Sports",
+        "id": 4
+    }
+}
+
+# Returns:
+
+{
+	"success": true,
+    "question": {
+        "id": 2
+        "question": "How many championships does the Lakers have?",
+        "answer": "5",
+        "difficulty": 1,
+        "category": "4"
+    }
+}
+```
+### Delete >> Question >> by: id
+DELETE /api/questions/2
+Endpoint to DELETE question using a question ID
+```bash
+# Endpoint: DELETE /api/questions/2
+# curl test
+curl -X DELETE http://127.0.0.1:5000/api/questions/4
+# Returns:
+{
+  "action": "delete",
+  "id": 4,
+  "success": true
+}
+```
+
+### Read >> All Categories
+GET /api/categories
+Endpoint to handle GET requests, for all available categories.
+```bash
+# Endpoint: GET /api/categories
+# curl test
+curl -X GET http://127.0.0.1:5000/api/categories
+# Returns:
+{
+  "categories": [
+    {
+      "id": 1,
+      "type": "Science"
+    },
+    {
+      "id": 2,
+      "type": "Art"
+    },
+    {
+      "id": 3,
+      "type": "Geography"
+    },
+    {
+      "id": 4,
+      "type": "History"
+    },
+    {
+      "id": 5,
+      "type": "Entertainment"
+    },
+    {
+      "id": 6,
+      "type": "Sports"
+    }
+  ],
+  "success": true,
+  "total_categories": 6
 }
 
 ```

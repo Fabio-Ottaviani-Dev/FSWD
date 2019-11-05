@@ -144,7 +144,7 @@ def create_app(test_config=None):
 # only question that include that string within their question.
 # Try using the word "title" to start.
 
-# OK 200 | curl -X POST -H "Content-Type: application/json" -d '{"search":"which"}' http://127.0.0.1:5000/api/questions/search
+# OK 200 | curl -X POST -H "Content-Type: application/json" -d '{"searchTerm":"lake"}' http://127.0.0.1:5000/api/questions/search
 # OK 400 | curl -X POST -H "Content-Type: application/json" -d '{"key":"which"}' http://127.0.0.1:5000/api/questions/search
 # OK 404 | curl -X POST -H "Content-Type: application/json" -d '{"search":"sdsdsdsds"}' http://127.0.0.1:5000/api/questions/search
 # **DONE**
