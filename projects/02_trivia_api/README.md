@@ -18,7 +18,7 @@ Our tech stack will include:
 * **Python3** and **Flask** as our server language and server framework.
 * **React** for the frontend.
 
-##Setup
+## Setup
 
 ### Backend
 [View the README.md within ./backend for more details.](./backend/README.md)
