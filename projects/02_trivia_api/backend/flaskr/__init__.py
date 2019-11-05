@@ -153,7 +153,7 @@ def create_app(test_config=None):
     def search_questions():
 
         data    = request.get_json()
-        search  = data.get('search', None)
+        search  = data.get('searchTerm', None)
 
         if search is None:
             abort(400)

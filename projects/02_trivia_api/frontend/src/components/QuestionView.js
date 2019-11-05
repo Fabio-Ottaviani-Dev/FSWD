@@ -78,7 +78,7 @@ class QuestionView extends Component {
 
   submitSearch = (searchTerm) => {
     $.ajax({
-      url: `/api/questions`,
+      url: `/api/questions/search`,
       type: "POST",
       dataType: 'json',
       contentType: 'application/json',
@@ -95,7 +95,7 @@ class QuestionView extends Component {
         return;
       },
       error: (error) => {
-        alert('Unable to load questions. Please try your request again')
+        alert('Unable to load questions. Please try your request again aaa')
         return;
       }
     })
