@@ -88,7 +88,7 @@ python3 test_flaskr.py
 
 
 ## Endpoints
-TODO
+**TODO**
 
 REVIEW_COMMENT
 ```
