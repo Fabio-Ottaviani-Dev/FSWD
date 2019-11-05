@@ -137,7 +137,7 @@ class TriviaTestCase(unittest.TestCase):
         self.assertTrue(data['current_category'])
 
 
-    # # expected error / s
+    # expected error / s
     def test_get_questions_by_category_404(self):
         id_category = 999
 
@@ -155,14 +155,57 @@ class TriviaTestCase(unittest.TestCase):
 # ----------------------------------------------------------------------------
 # Read >> Questions >> to play
 # ----------------------------------------------------------------------------
-# **TODO**       
+#  id |     type
+# ----+---------------
+#   1 | Science
+#   2 | Art
+#   3 | Geography
+#   4 | History
+#   5 | Entertainment
+#   6 | Sports
+
+    # successful operation
+    def test_next_quiz_question(self):
+
+        quiz_1 = {
+            'previous_questions':[13,14],
+            'quiz_category':{
+                'type': 'Geography',
+                'id': 3
+            }
+        }
+
+        res = self.client().post('/api/quizzes', json=quiz_1)
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(data['success'], True)
+        self.assertTrue(len(data['question']))
+
+    # expected error / s
+    def test_next_quiz_question_404(self):
+
+        quiz_2 = {
+            'previous_questions':[10,11],
+            'quiz_category':{
+                'type': 'Sports',
+                'id': 6
+            }
+        }
+
+        res = self.client().post('/api/quizzes', json=quiz_2)
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 404)
+        self.assertEqual(data['success'], False)
+        self.assertEqual(data['message'], 'Not Found')
 
 # ----------------------------------------------------------------------------
 # Delete >> Question >> by: id
 # ----------------------------------------------------------------------------
     # successful operation
     def test_delete_question(self):
-        id_question = 35
+        id_question = 46
 
         res = self.client().delete('/api/questions/{}'.format(id_question))
         data = json.loads(res.data)

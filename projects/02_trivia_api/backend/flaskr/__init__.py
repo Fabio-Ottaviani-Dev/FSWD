@@ -183,7 +183,7 @@ def create_app(test_config=None):
                 'total_questions':  total_questions,
                 'current_category': ''
             })
-       
+
         except:
           abort(422)
 
@@ -242,42 +242,38 @@ def create_app(test_config=None):
 # one question at a time is displayed, the user is allowed to answer
 # and shown whether they were correct or not.
 
-# OK 200 | curl -X POST -H "Content-Type: application/json" -d '{"previous_question":"1", "category":"1"}' http://127.0.0.1:5000/api/quizzes
-
     @app.route('/api/quizzes', methods=['POST'])
     def get_quiz_question():
 
-        data = request.get_json()
-        previous_question  = data.get('previous_question', None)
-        category = data.get('category', None)
+        previous_questions  = request.json.get('previous_questions', None)
+        quiz_category       = request.json.get('quiz_category', None)
 
-        if category is None:
+        error = 422
+
+        try:
+            category = quiz_category.get('id')
+
+            prevques = []
+            for question in previous_questions:
+                prevques.append(question)
+        except:
             abort(400)
+        try:
+            if category == 0:
+                next_question = Question.query.filter(~Question.id.in_(prevques)).order_by(func.random()).first()
+            else:
+                next_question = Question.query.filter(Question.category==category).filter(~Question.id.in_(prevques)).order_by(func.random()).first()
 
-        questions = (Question.query.filter(
-            Question.category == category
-        ).order_by(func.random()).limit(1).all())
-
-        questions_result = [question.format() for question in questions]
-
-        # try:
-        #     session['question_list']
-        # except NameError:
-        #     session['question_list'] = []
-        # else:
-        #     session['question_list'] = append(previous_questions)
-
-        # return jsonify({
-        #     'success': True,
-        #     'previous_question': previous_question,
-        #     'category': category,
-        #     'question': questions_result
-        # })
-
-        return jsonify({
-          'success': True,
-          'question': questions_result
-        })
+            if not next_question:
+                error = 404
+                abort(error)
+            else:
+                return jsonify({
+                    'success': True,
+                    'question': next_question.format()
+                })
+        except:
+            abort(error)
 
 # ----------------------------------------------------------------------------
 # Delete >> Question >> by: id

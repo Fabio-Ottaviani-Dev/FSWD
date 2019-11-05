@@ -10,13 +10,13 @@
 
 This project depends on Nodejs and Node Package Manager (NPM). Before continuing, you must download and install Node (the download includes NPM) from [https://nodejs.com/en/download](https://nodejs.org/en/download/).
 
-'''bash
+```bash
 
 node -v && npm -v
 # v12.13.0
 # 6.12.0
 
-'''
+```
 
 #### Installing project dependencies
 
