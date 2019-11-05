@@ -22,7 +22,7 @@ class QuizView extends Component {
 
   componentDidMount(){
     $.ajax({
-      url: `/api/categories`,
+      url: `/api/categories`, //TODO: update request URL (**DONE**)
       type: "GET",
       success: (result) => {
         this.setState({ categories: result.categories })
@@ -48,7 +48,7 @@ class QuizView extends Component {
     if(this.state.currentQuestion.id) { previousQuestions.push(this.state.currentQuestion.id) }
 
     $.ajax({
-      url: '/api/quizzes',
+      url: '/api/quizzes', //TODO: update request URL (**DONE**)
       type: "POST",
       dataType: 'json',
       contentType: 'application/json',
@@ -66,15 +66,12 @@ class QuizView extends Component {
           previousQuestions: previousQuestions,
           currentQuestion: result.question,
           guess: '',
+          forceEnd: result.question ? false : true
         })
         return;
       },
       error: (error) => {
-        if (error.status === 404) {
-          this.setState({forceEnd: true})
-        } else {
-          alert('Unable to load question. Please try your request again')
-        }
+        alert('Unable to load question. Please try your request again')
         return;
       }
     })
@@ -108,14 +105,14 @@ class QuizView extends Component {
               <div className="choose-header">Choose Category</div>
               <div className="category-holder">
                   <div className="play-category" onClick={this.selectCategory}>ALL</div>
-                  {this.state.categories.length > 0 && this.state.categories.map(category => {
+                  {Object.keys(this.state.categories).map(id => {
                   return (
                     <div
-                      key={category.id}
-                      value={category.id}
+                      key={id}
+                      value={id}
                       className="play-category"
-                      onClick={() => this.selectCategory({type: category.type, id: category.id})}>
-                      {category.type}
+                      onClick={() => this.selectCategory({type:this.state.categories[id], id})}>
+                      {this.state.categories[id]}
                     </div>
                   )
                 })}
