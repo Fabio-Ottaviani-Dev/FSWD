@@ -11,14 +11,22 @@ app = Flask(__name__)
 setup_db(app)
 CORS(app)
 
-'''
-@TODO uncomment the following line to initialize the datbase
-!! NOTE THIS WILL DROP ALL RECORDS AND START YOUR DB FROM SCRATCH
-!! NOTE THIS MUST BE UNCOMMENTED ON FIRST RUN
-@DONE@
-'''
+# ----------------------------------------------------------------------------
+# @TODO uncomment the following line to initialize the datbase
+# !! NOTE THIS WILL DROP ALL RECORDS AND START YOUR DB FROM SCRATCH
+# !! NOTE THIS MUST BE UNCOMMENTED ON FIRST RUN
+# @DONE@
+# recipe field data structure:
+# [{"color": "string", "name":"string", "parts":"number"}]
+# ----------------------------------------------------------------------------
 
-#db_drop_and_create_all()
+@app.route('/reset-db')
+def reset_db():
+    db_drop_and_create_all()
+    return jsonify({
+        'success': True,
+        'message': 'db_drop_and_create_all @DONE!'
+    })
 
 ## ROUTES
 @app.route('/')
@@ -34,17 +42,16 @@ def index():
 #         1. it should be a public endpoint
 #         2. it should contain only the drink.short() data representation
 #         3. returns status code 200 and json {"success": True, "drinks": drinks}
-#         where drinks is the list of drinks or appropriate status code
-#         indicating reason for failure
+#            where drinks is the list of drinks or appropriate status code
+#            indicating reason for failure
 # @DONE
 # ----------------------------------------------------------------------------
 
 @app.route('/drinks', methods=['GET'])
 def get_drinks():
-    drinks = Drink.query.order_by(Drink.title).all()
-    result = [drink.short() for drink in drinks]
-
-    total_results = len(drinks)
+    drinks          = Drink.query.order_by(Drink.title).all()
+    result          = [drink.short() for drink in drinks]
+    total_results   = len(drinks)
 
     if total_results == 0:
         abort(404)
@@ -54,26 +61,52 @@ def get_drinks():
         'drinks':   result
     })
 
+# ----------------------------------------------------------------------------
+# @TODO implement endpoint
+#     GET /drinks-detail
+#       1. it should require the 'get:drinks-detail' permission
+#       2. it should contain the drink.long() data representation
+#       3. returns status code 200 and json {"success": True, "drinks": drinks}
+#          where drinks is the list of drinks or appropriate status code
+#          indicating reason for failure.
+# ----------------------------------------------------------------------------
 
-'''
-@TODO implement endpoint
-    GET /drinks-detail
-        it should require the 'get:drinks-detail' permission
-        it should contain the drink.long() data representation
-    returns status code 200 and json {"success": True, "drinks": drinks} where drinks is the list of drinks
-        or appropriate status code indicating reason for failure
-'''
+@app.route('/drinks-detail', methods=['GET'])
+def get_drinks_detail():
 
+    drinks          = Drink.query.order_by(Drink.title).all()
+    result          = [drink.long() for drink in drinks]
+    total_results   = len(drinks)
 
-'''
-@TODO implement endpoint
-    POST /drinks
-        it should create a new row in the drinks table
-        it should require the 'post:drinks' permission
-        it should contain the drink.long() data representation
-    returns status code 200 and json {"success": True, "drinks": drink} where drink an array containing only the newly created drink
-        or appropriate status code indicating reason for failure
-'''
+    if total_results == 0:
+        abort(404)
+
+    return jsonify({
+        'success':  True,
+        'drinks':   result
+    })
+
+# ----------------------------------------------------------------------------
+# @TODO implement endpoint
+#     POST /drinks
+#         1. it should create a new row in the drinks table
+#         2. it should require the 'post:drinks' permission
+#         3. it should contain the drink.long() data representation
+#         4. returns status code 200 and json {"success": True, "drinks": drink}
+#            where drink an array containing only the newly created drink
+#            or appropriate status code indicating reason for failure
+# ----------------------------------------------------------------------------
+# OK 200 | curl -X POST http://127.0.0.1:5000/drinks
+# OK 201 | curl -X POST -H "Content-Type: application/json" -d '{"question":"Which is the result of 2+2 ?","answer":"4","difficulty":"100","category":"1"}' http://127.0.0.1:5000/drinks
+
+@app.route('/drinks', methods=['POST'])
+def create_drink():
+
+    return jsonify({
+        'success': True,
+        'message': 'you POST in /drinks'
+    })
+# ----------------------------------------------------------------------------
 
 
 '''
