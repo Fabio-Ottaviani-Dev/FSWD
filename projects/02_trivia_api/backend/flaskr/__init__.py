@@ -78,6 +78,8 @@ def create_app(test_config=None):
             return jsonify({
                 'success':  True,
                 'question': question.format()
+                 # Suggestion: It's better to return the ID of the created question in the response.
+
             }), 201 # 201 Created
 
         except:
@@ -125,7 +127,7 @@ def create_app(test_config=None):
                 'success':          True,
                 'questions':        questions_set,
                 'total_questions':  total_questions,
-                'current_category': '',
+                'current_category': '', #  Suggestion: You can return an array of categories of the returned list of questions, instead of returning an empty string in all cases.
                 'categories':       categories_result,
                 'page':             page
             })
