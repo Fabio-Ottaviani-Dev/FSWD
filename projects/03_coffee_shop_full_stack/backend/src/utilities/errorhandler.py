@@ -1,12 +1,10 @@
-# from app import app
-# from flask import jsonify
-
 #----------------------------------------------------------------------------#
 # Error handler
 # doc: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status
 #----------------------------------------------------------------------------#
-def http_error_handler():
-    # 400 Bad Request
+
+def http_error_handler(app, jsonify):
+
     @app.errorhandler(400)
     def bad_request(error):
         return jsonify({
@@ -15,7 +13,6 @@ def http_error_handler():
             'message': 'Bad Request'
         }), 400
 
-    # 401 Unauthorized
     @app.errorhandler(401)
     def unauthorized(error):
         return jsonify({
@@ -24,7 +21,14 @@ def http_error_handler():
             'message': 'Unauthorized'
         }), 401
 
-    # 404 Not Found
+    @app.errorhandler(403)
+    def forbidden(error):
+        return jsonify({
+            'success': False,
+            'error': 403,
+            'message': 'Forbidden'
+        }), 403
+
     @app.errorhandler(404)
     def not_found(error):
         return jsonify({
@@ -33,7 +37,6 @@ def http_error_handler():
             'message': 'Not Found'
         }), 404
 
-    # 405 Method Not Allowed
     @app.errorhandler(405)
     def method_not_allowed(error):
         return jsonify({
@@ -42,7 +45,6 @@ def http_error_handler():
             'message': 'Method Not Allowed'
         }), 405
 
-    # 422 Unprocessable Entity
     @app.errorhandler(422)
     def unprocessable_entity(error):
         return jsonify({
@@ -51,4 +53,10 @@ def http_error_handler():
             'message': 'Unprocessable Entity'
         }), 422
 
-#----------------------------------------------------------------------------#
+    @app.errorhandler(500)
+    def internal_server_error(error):
+        return jsonify({
+            'success': False,
+            'error': 500,
+            'message': 'Internal Server Error'
+        }), 500

@@ -6,9 +6,12 @@ from flask_cors import CORS
 
 from .database.models import db_drop_and_create_all, setup_db, Drink
 from .auth.auth import AuthError, requires_auth
+from .utilities.errorhandler import http_error_handler
 
 app = Flask(__name__)
+
 setup_db(app)
+http_error_handler(app, jsonify)
 CORS(app)
 
 # ----------------------------------------------------------------------------
@@ -16,8 +19,6 @@ CORS(app)
 # !! NOTE THIS WILL DROP ALL RECORDS AND START YOUR DB FROM SCRATCH
 # !! NOTE THIS MUST BE UNCOMMENTED ON FIRST RUN
 # @DONE@
-# recipe field data structure:
-# [{"color": "string", "name":"string", "parts":"number"}]
 # ----------------------------------------------------------------------------
 
 @app.route('/reset-db')
@@ -26,7 +27,7 @@ def reset_db():
     return jsonify({
         'success': True,
         'message': 'db_drop_and_create_all @DONE!'
-    })
+    }), 200
 
 ## ROUTES
 @app.route('/')
@@ -34,8 +35,9 @@ def index():
     return jsonify({
         'success': True,
         'message': 'What up Dude.. do you want a coffee.!?'
-    })
-
+    }), 200
+# ----------------------------------------------------------------------------
+# Read >> drinks list short
 # ----------------------------------------------------------------------------
 # @TODO implement endpoint
 #     GET /drinks
@@ -59,8 +61,9 @@ def get_drinks():
     return jsonify({
         'success':  True,
         'drinks':   result
-    })
-
+    }), 200
+# ----------------------------------------------------------------------------
+# Read >> drinks list detail
 # ----------------------------------------------------------------------------
 # @TODO implement endpoint
 #     GET /drinks-detail
@@ -84,8 +87,10 @@ def get_drinks_detail():
     return jsonify({
         'success':  True,
         'drinks':   result
-    })
+    }), 200
 
+# ----------------------------------------------------------------------------
+# Create >> drink
 # ----------------------------------------------------------------------------
 # @TODO implement endpoint
 #     POST /drinks
@@ -95,96 +100,107 @@ def get_drinks_detail():
 #         4. returns status code 200 and json {"success": True, "drinks": drink}
 #            where drink an array containing only the newly created drink
 #            or appropriate status code indicating reason for failure
+# @NOTES
+    # recipe field data structure:
+    # [{"color": "string", "name":"string", "parts":"number"}]
 # ----------------------------------------------------------------------------
-# OK 200 | curl -X POST http://127.0.0.1:5000/drinks
-# OK 201 | curl -X POST -H "Content-Type: application/json" -d '{"question":"Which is the result of 2+2 ?","answer":"4","difficulty":"100","category":"1"}' http://127.0.0.1:5000/drinks
 
 @app.route('/drinks', methods=['POST'])
 def create_drink():
 
+    title    = request.json.get('title', None)
+    recipe   = json.dumps(request.json.get('recipe', None))
+
+    if title is None or recipe is None:
+        abort(400)
+
+    drink = Drink(
+        title   = title,
+        recipe  = recipe
+    )
+
+    try:
+        drink.insert()
+    except:
+        abort(422)
+
     return jsonify({
-        'success': True,
-        'message': 'you POST in /drinks'
-    })
+        'success':  True,
+        'drink':    drink.long()
+    }), 201
+
+# ----------------------------------------------------------------------------
+# Update >> drink
+# ----------------------------------------------------------------------------
+# @TODO implement endpoint
+#     PATCH /drinks/<id>
+#         where <id> is the existing model id
+#         1. it should respond with a 404 error if <id> is not found
+#         2. it should update the corresponding row for <id>
+#         3. it should require the 'patch:drinks' permission
+#         4. it should contain the drink.long() data representation
+#            returns status code 200 and json {"success": True, "drinks": drink}
+#            where drink an array containing only the updated drink
+#            or appropriate status code indicating reason for failure
 # ----------------------------------------------------------------------------
 
+@app.route('/drinks/<int:drink_id>', methods=['PATCH'])
+def update_drink(drink_id):
 
-'''
-@TODO implement endpoint
-    PATCH /drinks/<id>
-        where <id> is the existing model id
-        it should respond with a 404 error if <id> is not found
-        it should update the corresponding row for <id>
-        it should require the 'patch:drinks' permission
-        it should contain the drink.long() data representation
-    returns status code 200 and json {"success": True, "drinks": drink} where drink an array containing only the updated drink
-        or appropriate status code indicating reason for failure
-'''
+    drink = Drink.query.get_or_404(drink_id)
 
+    title    = request.json.get('title', None)
+    recipe   = json.dumps(request.json.get('recipe', None))
 
-'''
-@TODO implement endpoint
-    DELETE /drinks/<id>
-        where <id> is the existing model id
-        it should respond with a 404 error if <id> is not found
-        it should delete the corresponding row for <id>
-        it should require the 'delete:drinks' permission
-    returns status code 200 and json {"success": True, "delete": id} where id is the id of the deleted record
-        or appropriate status code indicating reason for failure
-'''
+    if title is None or recipe is None:
+        abort(400)
+
+    drink.title = title
+    drink.recipe = recipe
+
+    try:
+        drink.update()
+    except:
+        abort(400)
+
+    return jsonify({
+        'success':  True,
+        'drink':    drink.long()
+    }), 200
+
+# ----------------------------------------------------------------------------
+# Delete >> drink
+# ----------------------------------------------------------------------------
+# @TODO implement endpoint
+#     DELETE /drinks/<id>
+#         where <id> is the existing model id
+#         1. it should respond with a 404 error if <id> is not found
+#         2. it should delete the corresponding row for <id>
+#         3. it should require the 'delete:drinks' permission
+#         4. returns status code 200 and json {"success": True, "delete": id}
+#            where id is the id of the deleted record
+#            or appropriate status code indicating reason for failure
+# ----------------------------------------------------------------------------
+
+@app.route('/drinks/<int:drink_id>', methods=['DELETE'])
+def delete_drink(drink_id):
+
+    drink = Drink.query.get_or_404(drink_id)
+
+    try:
+        drink.delete()
+    except exc.SQLAlchemyError:
+        abort(500)
+
+    return jsonify({
+        'success':  True,
+        'delete':   drink_id
+    }), 200
 
 # ----------------------------------------------------------------------------
 # Error Handling
 # @TODO
 #   1. implement error handlers using the @app.errorhandler(error) decorator
-#      each error handler should return (with approprate messages):
-        # jsonify({
-        #     "success": False,
-        #     "error": 404,
-        #     "message": "resource not found"
-        # }), 404
 # @DONE
 #   2. implement error handler for AuthError
 # ----------------------------------------------------------------------------
-
-@app.errorhandler(400)
-def bad_request(error):
-    return jsonify({
-        'success': False,
-        'error': 400,
-        'message': 'Bad Request'
-    }), 400
-
-@app.errorhandler(401)
-def unauthorized(error):
-    return jsonify({
-        'success': False,
-        'error': 401,
-        'message': 'Unauthorized'
-    }), 401
-
-@app.errorhandler(404)
-def not_found(error):
-    return jsonify({
-        'success': False,
-        'error': 404,
-        'message': 'Not Found'
-    }), 404
-
-@app.errorhandler(405)
-def method_not_allowed(error):
-    return jsonify({
-        'success': False,
-        'error': 405,
-        'message': 'Method Not Allowed'
-    }), 405
-
-@app.errorhandler(422)
-def unprocessable_entity(error):
-    return jsonify({
-        'success': False,
-        'error': 422,
-        'message': 'Unprocessable Entity'
-    }), 422
-
-#----------------------------------------------------------------------------#

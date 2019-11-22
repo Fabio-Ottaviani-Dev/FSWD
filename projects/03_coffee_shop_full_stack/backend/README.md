@@ -38,7 +38,7 @@ From within the `./src` directory first ensure you are working using your create
 The `--reload` flag will detect file changes and restart the server automatically.
 
 ```bash
-
+source env/bin/activate
 cd backend/src
 export FLASK_APP=api.py && export FLASK_ENV=development && flask run --reload
 
