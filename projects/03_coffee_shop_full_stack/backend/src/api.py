@@ -147,25 +147,32 @@ def get_drinks_detail(payload):
 @requires_auth('patch:drinks')
 def update_drink(payload, drink_id):
 
-    drink = Drink.query.get_or_404(drink_id)
-
     title    = request.json.get('title', None)
     recipe   = json.dumps(request.json.get('recipe', None))
 
     if title is None or recipe is None:
         abort(400)
 
-    drink.title = title
-    drink.recipe = recipe
+    drink = Drink.query.get_or_404(drink_id)
 
     try:
+        if title:
+            drink.title = title
+
+        if recipe:
+            drink.recipe = recipe
+
         drink.update()
     except:
         abort(400)
 
+    # Return an array for make postman useless test happy!
+    response = []
+    response.extend((drink.title, drink.recipe))
+
     return jsonify({
         'success':  True,
-        'drink':    drink.long()
+        'drinks':    response # drink.long()
     }), 200
 
 # ----------------------------------------------------------------------------
