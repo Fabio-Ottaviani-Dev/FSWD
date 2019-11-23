@@ -63,7 +63,7 @@ def create_drink(payload):
 
     try:
         drink.insert()
-    except:
+    except TypeError:
         abort(422)
 
     return jsonify({
