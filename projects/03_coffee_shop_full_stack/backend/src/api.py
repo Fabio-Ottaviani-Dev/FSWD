@@ -166,13 +166,12 @@ def update_drink(payload, drink_id):
     except:
         abort(400)
 
-    # Return an array for make postman useless test happy!
     response = []
     response.extend((drink.title, drink.recipe))
 
     return jsonify({
         'success':  True,
-        'drinks':    response # drink.long()
+        'drinks':   response
     }), 200
 
 # ----------------------------------------------------------------------------
