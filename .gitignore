@@ -2,5 +2,6 @@
 02-API-Development-and-Documentation/
 03-Identity-and-Access-Management/
 04-Server-deployment-containerization-and-testing/
+tmp-projects/
 _src/
 .DS_Store
