@@ -13,4 +13,4 @@ These projects are part of [Full-Stack Web Developer Nanodegree](https://www.uda
 1. [Fyyur](https://github.com/Fabio-Ottaviani-Dev/FSWD/tree/master/projects/01_fyyur)
 2. [Trivia API](https://github.com/Fabio-Ottaviani-Dev/FSWD/tree/master/projects/02_trivia_api)
 3. [Coffee Shop Full Stack](https://github.com/Fabio-Ottaviani-Dev/FSWD/tree/master/projects/03_coffee_shop_full_stack)
-4. [Deploy a Flask App to Kubernetes Using EKS](https://github.com/Fabio-Ottaviani-Dev/FSND/04_deploy_flask_app_to_kubernetes_using_eks)
+4. [Deploy a Flask App to Kubernetes Using EKS](https://github.com/Fabio-Ottaviani-Dev/FSND-Deploy-Flask-App-to-Kubernetes-Using-EKS)
