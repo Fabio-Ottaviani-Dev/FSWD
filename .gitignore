@@ -1,7 +1,11 @@
+_src/
 01-SQL-and-Data-Modeling-for-the-Web/
 02-API-Development-and-Documentation/
 03-Identity-and-Access-Management/
 04-Server-deployment-containerization-and-testing/
-tmp-projects/
-_src/
+05-Heroku/
+dosc/
+projects/Api_stuff
+projects/FSND-Deploy-Flask-App-to-Kubernetes-Using-EKS
+projects/itemCMS/
 .DS_Store
